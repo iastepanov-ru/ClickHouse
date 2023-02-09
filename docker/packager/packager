@@ -355,8 +355,8 @@ def main():
         help="a directory with ccache",
     )
     parser.add_argument(
-        "--sscache-bucket",
-        help="a bucket awith",
+        "--s3-bucket",
+        help="a bucket with cache for clang-tidy-cache and sscache",
     )
     parser.add_argument("--force-build-image", action="store_true")
     parser.add_argument("--version")
