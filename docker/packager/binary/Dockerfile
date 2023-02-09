@@ -25,7 +25,8 @@ RUN apt-get update && \
         libc6-dev-arm64-cross \
         yasm \
         zstd && \
-    apt-get clean
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists
 
 ENV CC=clang-${LLVM_VERSION}
 ENV CXX=clang++-${LLVM_VERSION}
@@ -60,13 +61,17 @@ RUN git clone --depth 1 https://github.com/tpoechtrager/cctools-port.git \
 RUN wget -nv https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.0.sdk.tar.xz
 
 # NOTE: Seems like gcc-11 is too new for ubuntu20 repository
+# A cross-linker for RISC-V 64 (we need it, because LLVM's LLD does not work):
+# boto3 is necessary for the clang-tidy-cache S3 feature
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test --yes \
     && apt-get update \
-    && apt-get install gcc-11 g++-11 --yes \
-    && apt-get clean
-
-# A cross-linker for RISC-V 64 (we need it, because LLVM's LLD does not work):
-RUN apt-get install binutils-riscv64-linux-gnu
+    && apt-get install --yes \
+      binutils-riscv64-linux-gnu \
+      gcc-11 \
+      g++-11 \
+      python3-boto3 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists
 
 # Architecture of the image when BuildKit/buildx is used
 ARG TARGETARCH
