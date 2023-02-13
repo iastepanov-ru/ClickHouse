@@ -317,7 +317,7 @@ def main():
     )
     parser.add_argument(
         "--clickhouse-repo-path",
-        default=SCRIPT_PATH.parent.parent,
+        default=SCRIPT_PATH.parents[2],
         type=dir_name,
         help="ClickHouse git repository",
     )
