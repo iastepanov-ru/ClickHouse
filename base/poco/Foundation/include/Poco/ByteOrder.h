@@ -18,9 +18,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Types.h"
-#if defined(_MSC_VER)
-#    include <stdlib.h> // builtins
-#endif
 
 
 namespace Poco
@@ -99,11 +96,7 @@ public:
 
 
 #if !defined(POCO_NO_BYTESWAP_BUILTINS)
-#    if defined(_MSC_VER)
-#        if (POCO_MSVC_VERSION > 71)
-#            define POCO_HAVE_MSC_BYTESWAP 1
-#        endif
-#    elif defined(__clang__)
+#    if   defined(__clang__)
 #        if __has_builtin(__builtin_bswap32)
 #            define POCO_HAVE_GCC_BYTESWAP 1
 #        endif
@@ -118,11 +111,7 @@ public:
 //
 inline UInt16 ByteOrder::flipBytes(UInt16 value)
 {
-#if defined(POCO_HAVE_MSC_BYTESWAP)
-    return _byteswap_ushort(value);
-#else
     return ((value >> 8) & 0x00FF) | ((value << 8) & 0xFF00);
-#endif
 }
 
 
@@ -134,9 +123,7 @@ inline Int16 ByteOrder::flipBytes(Int16 value)
 
 inline UInt32 ByteOrder::flipBytes(UInt32 value)
 {
-#if defined(POCO_HAVE_MSC_BYTESWAP)
-    return _byteswap_ulong(value);
-#elif defined(POCO_HAVE_GCC_BYTESWAP)
+#if   defined(POCO_HAVE_GCC_BYTESWAP)
     return __builtin_bswap32(value);
 #else
     return ((value >> 24) & 0x000000FF) | ((value >> 8) & 0x0000FF00) | ((value << 8) & 0x00FF0000) | ((value << 24) & 0xFF000000);
@@ -153,9 +140,7 @@ inline Int32 ByteOrder::flipBytes(Int32 value)
 #if defined(POCO_HAVE_INT64)
 inline UInt64 ByteOrder::flipBytes(UInt64 value)
 {
-#    if defined(POCO_HAVE_MSC_BYTESWAP)
-    return _byteswap_uint64(value);
-#    elif defined(POCO_HAVE_GCC_BYTESWAP)
+#    if   defined(POCO_HAVE_GCC_BYTESWAP)
     return __builtin_bswap64(value);
 #    else
     UInt32 hi = UInt32(value >> 32);

@@ -189,9 +189,6 @@ static int poco_ssl_probe_and_set_default_ca_location(SSL_CTX *ctx, Context::CAP
 		"/usr/local/etc/openssl/certs",
 		"/System/Library/OpenSSL",
 #endif
-#ifdef _AIX
-		"/var/ssl/certs/ca-bundle.crt",
-#endif
 	};
 
 	const char * dir = nullptr;

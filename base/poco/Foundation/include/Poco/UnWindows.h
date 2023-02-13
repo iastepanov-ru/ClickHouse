@@ -38,11 +38,6 @@
 
 
 // Reduce bloat
-#if defined(_WIN32)
-#    if !defined(WIN32_LEAN_AND_MEAN) && !defined(POCO_BLOATED_WIN32)
-#        define WIN32_LEAN_AND_MEAN
-#    endif
-#endif
 
 
 // Microsoft Visual C++ includes copies of the Windows header files
@@ -56,16 +51,11 @@
 // definitions.) For more information, see SdkDdkVer.h.
 
 
-#if !defined(_WIN32_WCE)
-#    if defined(_WIN32_WINNT)
-#        if (_WIN32_WINNT < 0x0502)
-#            error Unsupported Windows version.
-#        endif
-#    elif defined(NTDDI_VERSION)
+#    if   defined(NTDDI_VERSION)
 #        if (NTDDI_VERSION < 0x05020000)
 #            error Unsupported Windows version.
 #        endif
-#    elif !defined(_WIN32_WINNT)
+#    else
 // Define minimum supported version.
 // This can be changed, if needed.
 // If allowed (see POCO_MIN_WINDOWS_OS_SUPPORT
@@ -76,7 +66,6 @@
 #        define _WIN32_WINNT 0x0502
 #        define NTDDI_VERSION 0x05020000
 #    endif
-#endif
 
 
 // To prevent Platform_WIN32.h to modify version defines,

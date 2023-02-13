@@ -509,10 +509,8 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 		throw FileException("no space left on device", path, errno);
 	case EDQUOT:
 		throw FileException("disk quota exceeded", path, errno);
-#if !defined(_AIX)
 	case ENOTEMPTY:
 		throw DirectoryNotEmptyException(path, errno);
-#endif
 	case ENAMETOOLONG:
 		throw PathSyntaxException(path, errno);
 	case ENFILE:

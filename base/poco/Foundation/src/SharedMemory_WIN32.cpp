@@ -17,9 +17,6 @@
 #include "Poco/Exception.h"
 #include "Poco/File.h"
 #include "Poco/Format.h"
-#if defined (POCO_WIN32_UTF8)
-#include "Poco/UnicodeConverter.h"
-#endif
 #include "Poco/UnWindows.h"
 
 
@@ -37,34 +34,20 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	if (mode == SharedMemory::AM_WRITE)
 		_mode = PAGE_READWRITE;
 
-#if defined (POCO_WIN32_UTF8)
-	std::wstring utf16name;
-	UnicodeConverter::toUTF16(_name, utf16name);
-	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, 0, _size, utf16name.c_str());
-#else
 	_memHandle = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, _mode, 0, _size, _name.c_str());
-#endif
 
 	if (!_memHandle)
 	{
 		DWORD dwRetVal = GetLastError();
-#if defined (_WIN32_WCE)
-		throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
-#else
 		if (_mode != PAGE_READONLY || dwRetVal != 5)
 			throw SystemException(format("Cannot create shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
 
-#if defined (POCO_WIN32_UTF8)
-		_memHandle = OpenFileMappingW(PAGE_READONLY, FALSE, utf16name.c_str());
-#else
 		_memHandle = OpenFileMappingA(PAGE_READONLY, FALSE, _name.c_str());
-#endif
 		if (!_memHandle)
 		{
 			dwRetVal = GetLastError();
 			throw SystemException(format("Cannot open shared memory object %s [Error %d: %s]", _name, static_cast<int>(dwRetVal), Error::getMessage(dwRetVal)));
 		}
-#endif 
 	}
 	map();
 }
@@ -92,13 +75,7 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 		fileMode |= GENERIC_WRITE;
 	}
 
-#if defined (POCO_WIN32_UTF8)
-	std::wstring utf16name;
-	UnicodeConverter::toUTF16(_name, utf16name);
-	_fileHandle = CreateFileW(utf16name.c_str(), fileMode, shareMode, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-#else
 	_fileHandle = CreateFileA(_name.c_str(), fileMode, shareMode, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-#endif
 
 	if (_fileHandle == INVALID_HANDLE_VALUE)
 		throw OpenFileException("Cannot open memory mapped file", _name);

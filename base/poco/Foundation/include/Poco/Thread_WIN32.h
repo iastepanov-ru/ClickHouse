@@ -34,11 +34,7 @@ public:
     typedef DWORD TIDImpl;
     typedef void (*Callable)(void *);
 
-#if defined(_DLL)
-    typedef DWORD(WINAPI * Entry)(LPVOID);
-#else
     typedef unsigned(__stdcall * Entry)(void *);
-#endif
 
     enum Priority
     {
@@ -76,11 +72,7 @@ public:
     static TIDImpl currentTidImpl();
 
 protected:
-#if defined(_DLL)
-    static DWORD WINAPI runnableEntry(LPVOID pThread);
-#else
     static unsigned __stdcall runnableEntry(void * pThread);
-#endif
 
     void createImpl(Entry ent, void * pData);
     void threadCleanup();

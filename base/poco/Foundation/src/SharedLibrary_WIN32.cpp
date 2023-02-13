@@ -97,11 +97,7 @@ std::string SharedLibraryImpl::suffixImpl()
 
 bool SharedLibraryImpl::setSearchPathImpl(const std::string& path)
 {
-#if _WIN32_WINNT >= 0x0502
-	return SetDllDirectoryA(path.c_str()) != 0;
-#else
 	return false;
-#endif
 }
 
 

@@ -114,13 +114,9 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
-#if defined(_DLL)
-	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
-#else
 	unsigned threadId;
 	_thread = (HANDLE) _beginthreadex(NULL, _stackSize, ent, this, 0, &threadId);
 	_threadId = static_cast<DWORD>(threadId);
-#endif
 	if (!_thread)
 		throw SystemException("cannot create thread");
 	if (_prio != PRIO_NORMAL_IMPL && !SetThreadPriority(_thread, _prio))
@@ -190,11 +186,7 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 }
 
 
-#if defined(_DLL)
-DWORD WINAPI ThreadImpl::runnableEntry(LPVOID pThread)
-#else
 unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
-#endif
 {
 	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
 #if defined(POCO_WIN32_DEBUGGER_THREAD_NAMES)
