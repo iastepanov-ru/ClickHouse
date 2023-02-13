@@ -4,6 +4,7 @@ import argparse
 import csv
 import logging
 import os
+import re
 import subprocess
 import sys
 import atexit
@@ -111,17 +112,21 @@ def get_run_command(
 
 
 def get_tests_to_run(pr_info):
-    result = set([])
+    result = set()
 
     if pr_info.changed_files is None:
         return []
 
     for fpath in pr_info.changed_files:
-        if "tests/queries/0_stateless/0" in fpath:
-            logging.info("File %s changed and seems like stateless test", fpath)
+        if re.match(r"tests/queries/0_s[a-z]+/[0-9]{5}[a-zA-Z_]+\.reference$", fpath):
+            logging.info(f"File '{fpath}' is changed and seems like a test")
             fname = fpath.split("/")[3]
             fname_without_ext = os.path.splitext(fname)[0]
+            # Add '.' to the end of the test name not to run all tests with given prefix.
+            # We do not want to specify exact file extension not to complicate matching and look only for .reference
             result.add(fname_without_ext + ".")
+        elif "tests/queries/" in fpath:
+            logging.info(f"File '{fpath}' is changed, but it doesn't look like a test")
     return list(result)
 
 
